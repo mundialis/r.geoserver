@@ -12,6 +12,12 @@ then
   g.list all
 fi
 
+# download NC MODIS LST time series and unpack in nc_spm_full_v2alpha2
+cd /grassdb/nc_spm_full_v2alpha2/ && \
+	wget https://grass.osgeo.org/sampledata/north_carolina/nc_spm_mapset_modis2015_2016_lst.zip && \
+	unzip nc_spm_mapset_modis2015_2016_lst.zip && \
+	rm -f nc_spm_mapset_modis2015_2016_lst.zip
+
 # run all tests in folder
 FILENAME=$(basename "$(find . -name *.html -maxdepth 1)")
 ADDON="${FILENAME%%.html}"
