@@ -3,7 +3,7 @@
 # fail on non-zero return code from a subprocess
 set -e
 
-# download NC test loaction if the test needs the data and run tests
+# download NC test location if the test needs the data and run tests
 if [ "$1" == "NC" ]
 then
   g.extension g.download.location
@@ -20,7 +20,7 @@ CURRENTDIR=$(pwd)
 g.extension extension=${ADDON} url=. && \
 for file in $(find . -type f -name test*.py) ; \
 do  \
-  echo ${file}
+  echo ${file} ; \
   BASENAME=$(basename "${file}") ; \
   DIR=$(dirname "${file}") ; \
   cd ${CURRENTDIR}/${DIR} && python3 -m unittest ${BASENAME}
