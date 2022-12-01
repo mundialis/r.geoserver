@@ -1,0 +1,77 @@
+<h2>DESCRIPTION</h2>
+
+<em>t.geoserver.publish</em> is a GRASS GIS addon to publish and style each raster map
+of a space-time raster dataset (STRDS) to a GeoServer. The following environment variables are expected:
+<ul>
+  <li>GEOSERVER_HOST</li>
+  <li>GEOSERVER_PORT</li>
+  <li>GEOSERVER_USER</li>
+  <li>GEOSERVER_PASSWORD</li>
+  <li>GEOSERVER_WORKSPACE</li>
+  <li>OUTPUTFOLDER</li>
+</ul>
+In case a shared directory between GRASS GIS and GeoServer is possible,
+another environment variable can be used to tell GeoServer to publish data
+from this local path instead of uploading the data:
+<ul>
+  <li>GEOSERVER_DATAPATH</li>
+</ul>
+There are two ways to publish GeoServer layers with <em>t.geoserver.publish</em>:
+<p>
+Using the <b>layername_prefix</b> parameter, <tt>n</tt> GeoServer layers (referring to <tt>n</tt>
+maps in the input STRDS) are published. The output layers will receive a consecutive digit suffix
+(starting with <b>_1</b>). Internally, <a href="r.out.geoserver.html">r.out.geoserver</a> (with COG export)
+and <a href="r.geoserver.style.html">r.geoserver.style</a> are applied for each raster map of the input STRDS.
+In this case, the GEOSERVER_DATAPATH must be set - no upload is possible yet.
+<p>
+The second way is to use the <b>mosaic_layername</b> parameter. This publishes only a single GeoServer layer,
+where data is stored in an <a href="https://docs.geoserver.org/stable/en/user/data/raster/imagemosaic/index.html">ImageMosaic</a> coverage store.
+The individual time steps of the STRDS can be accessed via a GetCapabilities request towards the WMS:
+<div class="code"><pre>
+# excerpt from an example GetCapabilities response (note the time steps in the last line):
+...
+&lt;Layer queryable="1" opaque="0"&gt;
+&lt;Name&gt;imagemosaiclayer_ndvi_test&lt;/Name&gt;
+&lt;Title&gt;imagemosaiclayer_ndvi_test&lt;/Title&gt;
+&lt;Abstract&gt;Layer-Group type layer: imagemosaiclayer_ndvi_test&lt;/Abstract&gt;
+&lt;KeywordList&gt;
+&lt;Keyword&gt;WMS&lt;/Keyword&gt;
+&lt;Keyword&gt;imagemosaiclayer_ndvi_test&lt;/Keyword&gt;
+&lt;/KeywordList&gt;
+&lt;SRS&gt;EPSG:32632&lt;/SRS&gt;
+&lt;LatLonBoundingBox minx="6.863079303626465" miny="50.95291761097877" maxx="7.074111500405225" maxy="51.09954810295821"/&gt;
+&lt;BoundingBox SRS="EPSG:32632" minx="350370.0" miny="5646750.0" maxx="364740.0" maxy="5662670.0"/&gt;
+&lt;Dimension name="time" units="ISO8601"/&gt;
+&lt;Extent name="time" default="current"&gt;2022-04-17T00:00:00.000Z,2022-06-16T00:00:00.000Z,2022-08-10T00:00:00.000Z&lt;/Extent&gt;
+...
+</pre></div>
+The individual time steps can be visualised by adding <pre>&TIME=yyyymmDD</pre> to the WMS URL.
+
+<h2>NOTES</h2>
+To comply with GeoServer layer styling and still have a meaningful color range,
+raster values are rescaled to a range of 0-255 based on the 2% and 98% percentiles.
+<p>
+Note that always the entire rasters of the STRDS are published, regardless of the current computational region
+(the computational region is temporarily set to the registered raster maps).
+<h2>EXAMPLE</h2>
+
+<div class="code"><pre>
+# Publish all maps of the STRDS S2_STRDS as individual layers "s2_layer_1", "s2_layer_2", "s2_layer_3",...
+t.geoserver.publish input=S2_STRDS color=viridis layername_prefix=s2_layer
+</pre></div>
+
+<div class="code"><pre>
+# Publish all maps of the STRDS S2_STRDS together as a single image mosaic layer "s2_layer"
+t.geoserver.publish input=S2_STRDS color=ryg mosaic_layername=s2_layer
+</pre></div>
+
+<h2>SEE ALSO</h2>
+
+<em>
+<a href="r.out.geoserver.html">r.out.geoserver</a>,
+<a href="r.geoserver.style.html">r.geoserver.style</a>
+</em>
+
+<h2>AUTHOR</h2>
+
+Guido Riembauer, <a href="https://www.mundialis.de/">mundialis</a>

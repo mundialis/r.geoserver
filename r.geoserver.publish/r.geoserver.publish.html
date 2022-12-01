@@ -1,0 +1,60 @@
+<h2>DESCRIPTION</h2>
+
+<em>r.geoserver.publish</em> is a GRASS GIS addon Python script to publish
+raster maps as well as space time raster data sets with
+<a href="https://mundialis.github.io/geoserver-grass-raster-datastore/">geoserver-grass-datastore</a> and creates a GeoServer layer for it.
+The module uses the GeoServer REST API.
+<p>
+It is important that you are in the mapset in which the raster map or space time
+raster data set is stored.
+<p>
+If you have a raster map and a space time raster map with the same name, which
+you use as <b>input</b>, then you have to set the <b>type</b> to "raster" or
+"strds".
+
+<h2>EXAMPLES</h2>
+
+<h3>Publish raster map to GeoServer</h3>
+
+Publish elevation map to GeoServer and set the style:
+
+<div class="code"><pre>
+# publish layer
+r.geoserver.publish input=elevation \
+  host=http://geoserver port=8080 user=admin password=geoserver \
+  workspace=spieltag coveragestore=elevation layername=elevation \
+  gs_file_path=/grassdb/nc_spm_08/PERMANENT
+# set style (applies current map color table)
+r.geoserver.style host=http://geoserver port=8080 user=admin password=geoserver \
+  workspace=spieltag layername=elevation
+</pre></div>
+
+<h3>Publish space time raster data set to geoserver</h3>
+
+Publish MODIS LST space time raster data to geoserver and set style (a mapset
+with the example mapset of the MODIS data is available here:
+
+<a href="https://grass.osgeo.org/sampledata/north_carolina/nc_spm_mapset_modis2015_2016_lst.zip">nc_spm_mapset_modis2015_2016_lst.zip</a>):
+<div class="code"><pre>
+# publish layer
+r.geoserver.publish input=LST_Day_monthly \
+  host=http://geoserver port=8080 user=admin password=geoserver \
+  workspace=spieltag coveragestore=modis_lst_strds layername=LST_Day_monthly \
+  gs_file_path=/grassdb/nc_spm_08_grass7/modis_lst
+# set style (applies color table of first map)
+r.colors MOD11B3.A2015001.h11v05.single_LST_Day_6km color=bcyr
+r.geoserver.style host=http://geoserver port=8080 user=admin password=geoserver \
+  workspace=spieltag layername=LST_Day_monthly
+</pre></div>
+
+<h2>SEE ALSO</h2>
+
+<em>
+<a href="r.out.gdal.html">r.out.gdal</a>,
+<a href="r.out.geoserver.html">r.out.geoserver</a>,
+<a href="r.geoserver.style.html">r.geoserver.style</a>
+</em>
+
+<h2>AUTHORS</h2>
+
+Anika Weinmann and Carmen Tawalika, <a href="https://www.mundialis.de/">mundialis</a>
