@@ -6,7 +6,7 @@
 exclude = .git
 max-line-length = 88
 per-file-ignores =
-    ./r.geoserver.publish.py: E501, F821
-    ./r.geoserver.style.py: E501, F821
-    ./testsuite/test_r_geoserver_style.py: E501
-    ./t.geoserver.publish.py: E501, F821
+    ./r.geoserver.publish/r.geoserver.publish.py: E501, F821
+    ./r.geoserver.style/r.geoserver.style.py: E501, F821
+    ./r.geoserver.style/testsuite/test_r_geoserver_style.py: E501
+    ./t.geoserver.publish/t.geoserver.publish.py: E501, F821
