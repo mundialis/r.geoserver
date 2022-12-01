@@ -3,8 +3,7 @@
 # fail on non-zero return code from a subprocess
 set -e
 
-#GRASSDB=/grassdb
-GRASSDB=/tmp
+GRASSDB=/grassdb
 
 # download NC test location if the test needs the data
 if [ "$1" == "NC" ]
