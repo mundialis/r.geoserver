@@ -2,7 +2,7 @@
 
 <em>r.geoserver.style</em> is a GRASS GIS addon Python script to publish
 a style based on GRASS GIS map and attach to layer with
-<tt>geoserver-grass-datastore</tt> store.
+<a href="https://mundialis.github.io/geoserver-grass-raster-datastore/">geoserver-grass-datastore</a> store.
 The module uses the GeoServer REST API.
 <p>
 For space time raster data sets the first map is taken to set the style for
@@ -45,7 +45,8 @@ r.geoserver.style host=http://geoserver port=8080 user=admin password=geoserver 
 
 <h3>Publish raster map to GeoServer <b>without geoserver-grass-datastore</b></h3>
 
-It is also possible to publish and style a raster map to a GeoSever without <tt>geoserver-grass-datastore</tt>.
+It is also possible to publish and style a raster map to a GeoSever without 
+<a href="https://mundialis.github.io/geoserver-grass-raster-datastore/">geoserver-grass-datastore</a>.
 In this case, a GeoTIFF raster is exported by <a href="r.out.geoserver.html">r.out.geoserver</a>
 and used to create a new GeoServer coveragestore. The <b>grassmap</b> parameter
 is then required in <em>r.geoserver.style</em> to export the style from a given
