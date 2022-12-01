@@ -157,7 +157,7 @@ class TestRGeoserverPublishRaster(TestGeoserverPublish):
         )
         resp_content = json.loads(resp.text)
         self.assertIn("features", resp_content, "'features' not in response")
-        self.assertEqual(1, len(resp_content["features"]), "Lenght of 'features' not 1")
+        self.assertEqual(1, len(resp_content["features"]), "Length of 'features' not 1")
         feat = resp_content["features"][0]
         self.assertIn("properties", feat, "'properties' not feature")
         self.assertIn(
@@ -250,7 +250,7 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
         )
         resp_content = json.loads(resp.text)
         self.assertIn("features", resp_content, "'features' not in response")
-        self.assertEqual(1, len(resp_content["features"]), "Lenght of 'features' not 1")
+        self.assertEqual(1, len(resp_content["features"]), "Length of 'features' not 1")
         feat = resp_content["features"][0]
         self.assertIn("properties", feat, "'properties' not feature")
         self.assertIn(
