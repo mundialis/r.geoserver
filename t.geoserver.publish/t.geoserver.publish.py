@@ -100,9 +100,9 @@ def cleanup():
         os.remove(rm_file)
 
 
-def get_env(envname):
+def get_env(envname, required=True):
     env = os.getenv(envname)
-    if env is None:
+    if env is None and required is True:
         grass.fatal(_(f"Environment variable {envname} not defined."))
     else:
         return env
@@ -295,11 +295,16 @@ def main():
     geoserver_user = get_env("GEOSERVER_USER")
     geoserver_pw = get_env("GEOSERVER_PASSWORD")
     geoserver_workspace = get_env("GEOSERVER_WORKSPACE")
-    outputfolder = get_env("OUTPUTFOLDER")
     # geoserver_datapath can be empty if no shared folder
     # between GRASS GIS and GeoServer is allowed, so
     # data will be uploaded instead of shared.
-    geoserver_datapath = os.getenv("GEOSERVER_DATAPATH")
+    geoserver_datapath = get_env("GEOSERVER_DATAPATH", required=False)
+    # if no shared folder exists, the OUTPUTFOLDER (where to store the temporary zip)
+    # does not matter, hence it can be a temp dir
+    if geoserver_datapath:
+        outputfolder = get_env("OUTPUTFOLDER")
+    else:
+        outputfolder = grass.tempdir()
 
     layer_suffix = 1
     layernames = list()
@@ -395,7 +400,7 @@ def main():
         if not geoserver_datapath:
             # Case when GRASS GIS and GeoServer don't share a common directory
             output_uuid = str(uuid.uuid4())
-            targetdir_grass = f"{targetdir_grass}/{output_uuid}"
+            targetdir_grass = os.path.join(targetdir_grass, output_uuid)
         if not os.path.isdir(targetdir_grass):
             os.makedirs(targetdir_grass)
         # if the dir exists and has files, cancel
@@ -505,8 +510,7 @@ def main():
                 geoserver_port,
                 geoserver_auth,
             )
-            rm_dirs.append(targetdir_grass)
-            rm_files.append(zip_name)
+            rm_dirs.append(outputfolder)
             layernames.append(mosaic_layername)
 
     # style the layer(s)
