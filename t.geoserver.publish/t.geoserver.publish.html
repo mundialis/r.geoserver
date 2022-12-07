@@ -8,13 +8,13 @@ of a space-time raster dataset (STRDS) to a GeoServer. The following environment
   <li>GEOSERVER_USER</li>
   <li>GEOSERVER_PASSWORD</li>
   <li>GEOSERVER_WORKSPACE</li>
-  <li>OUTPUTFOLDER</li>
 </ul>
 In case a shared directory between GRASS GIS and GeoServer is possible,
-another environment variable can be used to tell GeoServer to publish data
+two further environment variables can be used to tell GeoServer to publish data
 from this local path instead of uploading the data:
 <ul>
-  <li>GEOSERVER_DATAPATH</li>
+  <li>OUTPUTFOLDER (path from GRASS GIS to shared directory)</li>
+  <li>GEOSERVER_DATAPATH (path from GeoServer to shared directory)</li>
 </ul>
 There are two ways to publish GeoServer layers with <em>t.geoserver.publish</em>:
 <p>
