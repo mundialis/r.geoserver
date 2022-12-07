@@ -511,7 +511,6 @@ def main():
                 geoserver_auth,
             )
             rm_dirs.append(outputfolder)
-            rm_files.append(zip_name)
             layernames.append(mosaic_layername)
 
     # style the layer(s)
