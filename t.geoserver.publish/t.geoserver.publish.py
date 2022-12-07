@@ -302,9 +302,9 @@ def main():
     # if no shared folder exists, the OUTPUTFOLDER (where to store the temporary zip)
     # does not matter, hence it can be a temp dir
     if geoserver_datapath:
-        outputfolder = grass.tempdir()
-    else:
         outputfolder = get_env("OUTPUTFOLDER")
+    else:
+        outputfolder = grass.tempdir()
 
     layer_suffix = 1
     layernames = list()
