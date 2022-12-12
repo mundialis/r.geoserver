@@ -44,7 +44,7 @@
 # % type: string
 # % required: no
 # % multiple: no
-# % options: bcyr,bgyr,blues,byg,byr,elevation,evi,forest_cover,grass,greens,grey,gyr,ndvi,ndwi,reds,ryb,ryg
+# % options: bcyr,bgyr,blues,byg,byr,default,elevation,evi,forest_cover,grass,greens,grey,gyr,ndvi,ndwi,reds,ryb,ryg
 # % label: Name of color table for layer styling
 # %end
 
@@ -288,6 +288,8 @@ def main():
     layername_prefix = options["layername_prefix"]
     mosaic_layername = options["mosaic_layername"]
     color = options["color"]
+    if color == "default":
+        color = None
     color_rules = get_color_rules()
 
     # get env variables
