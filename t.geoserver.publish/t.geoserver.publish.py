@@ -42,7 +42,7 @@
 # %option
 # % key: color
 # % type: string
-# % required: no
+# % required: yes
 # % multiple: no
 # % options: bcyr,bgyr,blues,byg,byr,elevation,evi,forest_cover,grass,greens,grey,gyr,inferno,magma,ndvi,ndwi,reds,ryb,ryg,viridis
 # % label: Name of color table for layer styling
