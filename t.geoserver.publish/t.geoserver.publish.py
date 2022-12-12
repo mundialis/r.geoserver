@@ -44,6 +44,7 @@
 # % type: string
 # % required: no
 # % multiple: no
+# % options: bcyr,bgyr,blues,byg,byr,elevation,evi,forest_cover,grass,greens,grey,gyr,inferno,magma,ndvi,ndwi,reds,ryb,ryg,viridis
 # % label: Name of color table for layer styling
 # %end
 
@@ -365,13 +366,13 @@ def main():
     for map, rescaled_map in zip(map_names, rescaled_maps):
         grass.run_command("g.region", raster=map)
         if color:
-            # values smaller than 2% get 0.5, larger than 98% get 255
+            # values smaller than 2% get 1, larger than 98% get 255
             # small values don't get 0 because geoserver can't handle 0
             rescale_exp = (
                 f"({map} - {new_min_min}) * 255.0 /" f" ({new_max_max} - {new_min_min})"
             )
             expression = (
-                f"{rescaled_map} = float(if({map}<={new_min_min},0.5,"
+                f"{rescaled_map} = float(if({map}<={new_min_min},1,"
                 f"if({map}>{new_max_max},255,{rescale_exp})))"
             )
             grass.run_command("r.mapcalc", expression=expression)
