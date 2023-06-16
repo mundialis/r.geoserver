@@ -5,7 +5,7 @@ set -e
 
 GRASSDB=/grassdb
 
-# download NC test location if the test needs the data
+# download North Carolina test location if the test needs the data and run tests
 if [ "$1" == "NC" ]
 then
   # this is run in nc_spm_empty
