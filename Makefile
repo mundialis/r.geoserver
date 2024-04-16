@@ -11,7 +11,10 @@ SUBDIRS := $(filter-out $(RM_SUBDIRS), $(SUBDIRS_1))
 
 include $(MODULE_TOPDIR)/include/Make/Dir.make
 
-default: parsubdirs htmldir
+python-requirements:
+	pip install -r requirements.txt
+
+default: python-requirements parsubdirs htmldir
 
 install: installsubdirs
 	$(INSTALL_DATA) $(PGM).html $(INST_DIR)/docs/html/
