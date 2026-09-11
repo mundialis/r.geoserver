@@ -62,14 +62,14 @@
 
 
 import atexit
-import grass.script as grass
-import grass.temporal as tgis
 import json
 import os
 import stat
 import requests
 import uuid
 from shutil import make_archive, rmtree
+import grass.script as grass
+import grass.temporal as tgis
 
 rm_rasters = []
 rm_dirs = []
@@ -78,6 +78,16 @@ region = None
 
 
 def cleanup():
+    """
+    Clean up temporary resources created during module execution.
+
+    This function is registered as an atexit handler and
+    performs cleanup of various temporary data
+
+    The cleanup is performed silently with flags set to force removal
+    and suppress error output.
+    """
+
     nuldev = open(os.devnull, "w")
     kwargs = {"flags": "f", "quiet": True, "stderr": nuldev}
     for rmrast in rm_rasters:
@@ -101,6 +111,9 @@ def cleanup():
 
 
 def get_env(envname, required=True):
+    """
+    Get the value of an environment variable.
+    """
     env = os.getenv(envname)
     if env is None and required is True:
         grass.fatal(_(f"Environment variable {envname} not defined."))
@@ -109,6 +122,10 @@ def get_env(envname, required=True):
 
 
 def get_color_rules():
+    """
+    Get the color rules defined in GRASS GIS.
+    """
+
     # get color ranges
     rules_list = list(grass.parse_command("r.colors", flags="d").keys())
     rules_dict = dict()
@@ -126,6 +143,9 @@ def get_color_rules():
 
 
 def create_imagemosaic_auxfiles(targetdir):
+    """
+    Create auxiliary files for an ImageMosaic in the specified target directory.
+    """
     # creates indexer.properties and timeregex.properties files
     indexer_file = os.path.join(targetdir, "indexer.properties")
     timeregex_file = os.path.join(targetdir, "timeregex.properties")
@@ -146,7 +166,12 @@ def create_imagemosaic_auxfiles(targetdir):
     return
 
 
-def create_imagemosaic_coveragestore(geoserver_path, name, host, port, workspace, auth):
+def create_imagemosaic_coveragestore(
+    geoserver_path, name, host, port, workspace, auth
+):
+    """
+    Create an ImageMosaic coverage store in GeoServer.
+    """
     # creates a new image mosaic coverage store
     grass.message(_("Creating ImageMosaic coveragestore..."))
     headers = {"content-type": "application/json"}
@@ -160,7 +185,10 @@ def create_imagemosaic_coveragestore(geoserver_path, name, host, port, workspace
         }
     }
     postbody = json.dumps(postbody_dict)
-    url = f"{host}:{port}/geoserver/rest/" f"workspaces/{workspace}/coveragestores"
+    url = (
+        f"{host}:{port}/geoserver/rest/"
+        f"workspaces/{workspace}/coveragestores"
+    )
     resp = requests.post(url, headers=headers, data=postbody, auth=auth)
     if resp.status_code != 201:
         grass.fatal(
@@ -172,6 +200,9 @@ def create_imagemosaic_coveragestore(geoserver_path, name, host, port, workspace
 
 
 def generate_postbody_for_layer(layername, workspace, coveragestore, epsg):
+    """
+    Generate the JSON post body for creating or updating a GeoServer layer.
+    """
     metadata = {
         "entry": [
             {"@key": "elevation", "dimensionInfo": {"enabled": False}},
@@ -216,11 +247,18 @@ def generate_postbody_for_layer(layername, workspace, coveragestore, epsg):
     return postbody
 
 
-def create_geoserver_layer(layername, workspace, coveragestore, epsg, host, port, auth):
+def create_geoserver_layer(
+    layername, workspace, coveragestore, epsg, host, port, auth
+):
+    """
+    Create a new GeoServer layer with time dimension enabled.
+    """
     # publishes a new layer with time dimension enabled
     grass.message(_(f"Creating ImageMosaic layer {workspace}:{layername}..."))
     headers = {"content-type": "application/json"}
-    postbody = generate_postbody_for_layer(layername, workspace, coveragestore, epsg)
+    postbody = generate_postbody_for_layer(
+        layername, workspace, coveragestore, epsg
+    )
     url = (
         f"{host}:{port}/geoserver/rest/workspaces/{workspace}/"
         f"coveragestores/{coveragestore}/coverages"
@@ -237,11 +275,20 @@ def create_geoserver_layer(layername, workspace, coveragestore, epsg, host, port
         grass.message(_("Creation of ImageMosaic layer succeeded!"))
 
 
-def update_geoserver_layer(layername, workspace, coveragestore, epsg, host, port, auth):
+def update_geoserver_layer(
+    layername, workspace, coveragestore, epsg, host, port, auth
+):
+    """
+    Update an existing GeoServer layer.
+    """
     # updates an existing layer (name and time dimension enabled)
-    grass.message(_(f"Updating ImageMosaic layer {workspace}:{coveragestore}..."))
+    grass.message(
+        _(f"Updating ImageMosaic layer {workspace}:{coveragestore}...")
+    )
     headers = {"content-type": "application/json"}
-    postbody = generate_postbody_for_layer(layername, workspace, coveragestore, epsg)
+    postbody = generate_postbody_for_layer(
+        layername, workspace, coveragestore, epsg
+    )
     url = (
         f"{host}:{port}/geoserver/rest/workspaces/{workspace}/"
         f"coveragestores/{coveragestore}/coverages/{coveragestore}"
@@ -259,19 +306,29 @@ def update_geoserver_layer(layername, workspace, coveragestore, epsg, host, port
 
 
 def zip_mosaic_definition_and_granules(targetdir_grass, zip_basename):
+    """
+    Create a zip archive of the ImageMosaic definition and granules.
+    """
     grass.message(_("Creating ImageMosaic Archive for upload..."))
     make_archive(zip_basename, "zip", targetdir_grass)
     grass.message(_("Archive of ImageMosaic created! "))
 
 
-def upload_new_imagemosaic(workspace, coveragestore, host, port, auth, zipname):
+def upload_new_imagemosaic(
+    workspace, coveragestore, host, port, auth, zipname
+):
+    """
+    Upload a new ImageMosaic to GeoServer.
+    """
     grass.message(_("Uploading ImageMosaic..."))
     headers = {"Content-type": "application/zip"}
     url = (
         f"{host}:{port}/geoserver/rest/workspaces/{workspace}/"
         f"coveragestores/{coveragestore}/file.imagemosaic"
     )
-    resp = requests.put(url, headers=headers, data=open(zipname, "rb"), auth=auth)
+    resp = requests.put(
+        url, headers=headers, data=open(zipname, "rb"), auth=auth
+    )
     if resp.status_code != 201:
         grass.fatal(_("Upload of ImageMosaic failed!"))
     else:
@@ -279,8 +336,13 @@ def upload_new_imagemosaic(workspace, coveragestore, host, port, auth, zipname):
 
 
 def main():
+    """
+    Main function to publish GRASS GIS STRDS to GeoServer.
+    """
 
     global rm_rasters, region
+
+    rm_rasters = []
 
     tgis.init()
     input = options["input"]
@@ -344,7 +406,9 @@ def main():
             # make the output SLD too long)
 
             perc_list = list(
-                grass.parse_command("r.quantile", input=map, percentiles="2,98").keys()
+                grass.parse_command(
+                    "r.quantile", input=map, percentiles="2,98"
+                ).keys()
             )
             percentiles = [float(item.split(":")[2]) for item in perc_list]
             new_min = percentiles[0]
@@ -368,7 +432,8 @@ def main():
             # values smaller than 2% get 0.5, larger than 98% get 255
             # small values don't get 0 because geoserver can't handle 0
             rescale_exp = (
-                f"({map} - {new_min_min}) * 255.0 /" f" ({new_max_max} - {new_min_min})"
+                f"({map} - {new_min_min}) * 255.0 /"
+                f" ({new_max_max} - {new_min_min})"
             )
             expression = (
                 f"{rescaled_map} = float(if({map}<={new_min_min},0.5,"
@@ -396,7 +461,9 @@ def main():
             )
     if mosaic_layername:
         # create a new dir in the geoserver geodata folder
-        targetdir_grass = os.path.join(outputfolder, "geodata", mosaic_layername)
+        targetdir_grass = os.path.join(
+            outputfolder, "geodata", mosaic_layername
+        )
         if not geoserver_datapath:
             # Case when GRASS GIS and GeoServer don't share a common directory
             output_uuid = str(uuid.uuid4())
@@ -488,7 +555,9 @@ def main():
             # Case when GRASS GIS and GeoServer cannot share a common directory
             # Data is archived and uploaded to GS to create a new layer
 
-            zip_basename = f"{targetdir_grass.split(output_uuid)[0]}{output_uuid}"
+            zip_basename = (
+                f"{targetdir_grass.split(output_uuid)[0]}{output_uuid}"
+            )
             zip_name = f"{zip_basename}.zip"
             zip_mosaic_definition_and_granules(targetdir_grass, zip_basename)
 
@@ -517,7 +586,10 @@ def main():
     if color:
         for layername in layernames:
             grass.message(
-                _(f"Styling layer {layername} with" " GRASS color table {color}...")
+                _(
+                    f"Styling layer {layername} with"
+                    " GRASS color table {color}..."
+                )
             )
             ref_map = rescaled_maps[0]
             color_kwargs = {"map": ref_map, "color": color}

@@ -69,7 +69,9 @@ class TestGeoserverPublish(TestCase):
             f"{cls.baseurl}/rest/workspaces/{workspace}/"
             f"coveragestores/{coveragestore}?recurse=true"
         )
-        resp = requests.delete(url, auth=(cls.geoserver_user, cls.geoserver_password))
+        resp = requests.delete(
+            url, auth=(cls.geoserver_user, cls.geoserver_password)
+        )
         if resp.status_code != 200:
             cls.assertIn(
                 "No such coverage store",
@@ -81,10 +83,14 @@ class TestGeoserverPublish(TestCase):
     def delete_workspace(cls, workspace):
         """Delete the created workspace"""
         url = f"{cls.baseurl}/rest/workspaces/{workspace}?recurse=true"
-        resp = requests.delete(url, auth=(cls.geoserver_user, cls.geoserver_password))
+        resp = requests.delete(
+            url, auth=(cls.geoserver_user, cls.geoserver_password)
+        )
         if resp.status_code != 200:
             cls.assertIn(
-                "Status 404 – Not Found", resp.text, "Workspace can not be deleted!"
+                "Status 404 – Not Found",
+                resp.text,
+                "Workspace can not be deleted!",
             )
 
 
@@ -141,7 +147,9 @@ class TestRGeoserverStyleRaster(TestGeoserverPublish):
             del os.environ["TEST_GEOSERVER_CONNECTION"]
 
     def getGeoServerPath(self):
-        return os.path.join(self.geoserver_grass_path, self.location_name, self.mapset)
+        return os.path.join(
+            self.geoserver_grass_path, self.location_name, self.mapset
+        )
 
     @unittest.skipIf(
         os.environ["TEST_GEOSERVER_CONNECTION"] != "True",
@@ -179,14 +187,18 @@ class TestRGeoserverStyleRaster(TestGeoserverPublish):
             f"{self.baseurl}/rest/workspaces/{self.workspace}/styles/"
             f"{self.layername}.sld"
         )
-        resp = requests.get(url, auth=(self.geoserver_user, self.geoserver_password))
+        resp = requests.get(
+            url, auth=(self.geoserver_user, self.geoserver_password)
+        )
         self.assertEqual(
             resp.status_code,
             200,
             "Requesting the style of the layer does not return status code 200",
         )
         resp_content = resp.text
-        self.assertIn(self.sld, resp_content, "SLD in response is not as expected")
+        self.assertIn(
+            self.sld, resp_content, "SLD in response is not as expected"
+        )
 
 
 class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
@@ -230,7 +242,9 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
     @classmethod
     def setUpClass(cls):
         """Change the mapset"""
-        cls.current_mapset = [x for x in grass.parse_command("g.mapset", flags="p")][0]
+        cls.current_mapset = [
+            x for x in grass.parse_command("g.mapset", flags="p")
+        ][0]
         cls.runModule("g.mapset", mapset=cls.mapset)
 
     @classmethod
@@ -249,7 +263,9 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
             cls.runModule("g.mapset", mapset=cls.current_mapset)
 
     def getGeoServerPath(self):
-        return os.path.join(self.geoserver_grass_path, self.location_name, self.mapset)
+        return os.path.join(
+            self.geoserver_grass_path, self.location_name, self.mapset
+        )
 
     @unittest.skipIf(
         os.environ["TEST_GEOSERVER_CONNECTION"] != "True",
@@ -289,14 +305,18 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
             f"{self.baseurl}/rest/workspaces/{self.workspace}/styles/"
             f"{self.layername}.sld"
         )
-        resp = requests.get(url, auth=(self.geoserver_user, self.geoserver_password))
+        resp = requests.get(
+            url, auth=(self.geoserver_user, self.geoserver_password)
+        )
         self.assertEqual(
             resp.status_code,
             200,
             "Requesting the style of the layer does not return status code 200",
         )
         resp_content = resp.text
-        self.assertIn(self.sld, resp_content, "SLD in response is not as expected")
+        self.assertIn(
+            self.sld, resp_content, "SLD in response is not as expected"
+        )
 
 
 if __name__ == "__main__":

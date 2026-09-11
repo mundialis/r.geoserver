@@ -108,6 +108,10 @@ from grass.script import core as grass
 
 
 def main():
+    """
+    Main function to publish a style based on GRASS GIS map and
+    attach it to a layer in GeoServer.
+    """
 
     host = options["host"]
     port = options["port"]
@@ -155,13 +159,16 @@ def main():
     raster_exists = False
     if type == "auto" or type == "raster":
         raster_in_mapset = [
-            rast.split("@")[0] for rast in grass.parse_command("g.list", type="raster")
+            rast.split("@")[0]
+            for rast in grass.parse_command("g.list", type="raster")
         ]
         if grassmap in raster_in_mapset:
             raster_exists = True
             type = "raster"
     if raster_exists and strds_exists:
-        grass.fatal(_(f"There is both a strds and a raster with name <{grassmap}>"))
+        grass.fatal(
+            _(f"There is both a strds and a raster with name <{grassmap}>")
+        )
     elif raster_exists is False and strds_exists is False:
         grass.fatal(_(f"Input <{grassmap}> does not exist"))
 
@@ -208,13 +215,14 @@ def main():
 
     grass.message(_("Attaching style to layer..."))
     layer_dict["layer"]["defaultStyle"]["name"] = layername
-    layer_dict["layer"]["defaultStyle"][
-        "href"
-    ] = "%s:%s/geoserver/rest/workspaces/%s/styles/%s.json" % (
-        host,
-        port,
-        workspace,
-        layername,
+    layer_dict["layer"]["defaultStyle"]["href"] = (
+        "%s:%s/geoserver/rest/workspaces/%s/styles/%s.json"
+        % (
+            host,
+            port,
+            workspace,
+            layername,
+        )
     )
     headers = {"content-type": "application/json"}
     postbody = json.dumps(layer_dict)

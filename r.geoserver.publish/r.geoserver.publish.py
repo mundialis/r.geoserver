@@ -182,14 +182,17 @@ def main():
     raster_exists = False
     if type == "auto" or type == "raster":
         raster_in_mapset = [
-            rast.split("@")[0] for rast in grass.parse_command("g.list", type="raster")
+            rast.split("@")[0]
+            for rast in grass.parse_command("g.list", type="raster")
         ]
         if input in raster_in_mapset:
             raster_exists = True
             gs_file_path = os.path.join(gs_file_path, "cellhd", input)
             type = "raster"
     if raster_exists and strds_exists:
-        grass.fatal(_(f"There is both a strds and a raster with name <{input}>"))
+        grass.fatal(
+            _(f"There is both a strds and a raster with name <{input}>")
+        )
     elif raster_exists is False and strds_exists is False:
         grass.fatal(_(f"Input <{input}> does not exist"))
 
@@ -220,7 +223,11 @@ def main():
         }
     }
     postbody = json.dumps(coveragestore_dict)
-    url = "%s:%s/geoserver/rest/workspaces/%s/coveragestores" % (host, port, workspace)
+    url = "%s:%s/geoserver/rest/workspaces/%s/coveragestores" % (
+        host,
+        port,
+        workspace,
+    )
     resp = requests.post(url, headers=headers, data=postbody, auth=(user, pw))
     if resp.status_code != 201:
         grass.fatal(_("Creation of coveragestore failed!"))

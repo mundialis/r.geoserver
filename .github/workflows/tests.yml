@@ -26,3 +26,7 @@ jobs:
         file: .github/workflows/Dockerfile
         no-cache: true
         # pull: true
+    permissions:
+      contents: read
+      security-events: write
+
