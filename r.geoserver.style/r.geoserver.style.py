@@ -108,6 +108,10 @@ from grass.script import core as grass
 
 
 def main():
+    """
+    Main function to publish a style based on GRASS GIS map and
+    attach it to a layer in GeoServer.
+    """
 
     host = options["host"]
     port = options["port"]

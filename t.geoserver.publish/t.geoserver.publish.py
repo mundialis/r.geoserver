@@ -62,14 +62,14 @@
 
 
 import atexit
-import grass.script as grass
-import grass.temporal as tgis
 import json
 import os
 import stat
 import requests
 import uuid
 from shutil import make_archive, rmtree
+import grass.script as grass
+import grass.temporal as tgis
 
 rm_rasters = []
 rm_dirs = []
@@ -78,6 +78,16 @@ region = None
 
 
 def cleanup():
+    """
+    Clean up temporary resources created during module execution.
+    
+    This function is registered as an atexit handler and
+    performs cleanup of various temporary data
+    
+    The cleanup is performed silently with flags set to force removal
+    and suppress error output.
+    """
+
     nuldev = open(os.devnull, "w")
     kwargs = {"flags": "f", "quiet": True, "stderr": nuldev}
     for rmrast in rm_rasters:
@@ -101,6 +111,9 @@ def cleanup():
 
 
 def get_env(envname, required=True):
+    """
+    Get the value of an environment variable.
+    """
     env = os.getenv(envname)
     if env is None and required is True:
         grass.fatal(_(f"Environment variable {envname} not defined."))
@@ -109,6 +122,10 @@ def get_env(envname, required=True):
 
 
 def get_color_rules():
+    """
+    Get the color rules defined in GRASS GIS.
+    """
+
     # get color ranges
     rules_list = list(grass.parse_command("r.colors", flags="d").keys())
     rules_dict = dict()
@@ -126,6 +143,9 @@ def get_color_rules():
 
 
 def create_imagemosaic_auxfiles(targetdir):
+    """
+    Create auxiliary files for an ImageMosaic in the specified target directory.
+    """
     # creates indexer.properties and timeregex.properties files
     indexer_file = os.path.join(targetdir, "indexer.properties")
     timeregex_file = os.path.join(targetdir, "timeregex.properties")
@@ -149,6 +169,9 @@ def create_imagemosaic_auxfiles(targetdir):
 def create_imagemosaic_coveragestore(
     geoserver_path, name, host, port, workspace, auth
 ):
+    """
+    Create an ImageMosaic coverage store in GeoServer.
+    """
     # creates a new image mosaic coverage store
     grass.message(_("Creating ImageMosaic coveragestore..."))
     headers = {"content-type": "application/json"}
@@ -177,6 +200,9 @@ def create_imagemosaic_coveragestore(
 
 
 def generate_postbody_for_layer(layername, workspace, coveragestore, epsg):
+    """
+    Generate the JSON post body for creating or updating a GeoServer layer.
+    """
     metadata = {
         "entry": [
             {"@key": "elevation", "dimensionInfo": {"enabled": False}},
@@ -224,6 +250,9 @@ def generate_postbody_for_layer(layername, workspace, coveragestore, epsg):
 def create_geoserver_layer(
     layername, workspace, coveragestore, epsg, host, port, auth
 ):
+    """
+    Create a new GeoServer layer with time dimension enabled.
+    """
     # publishes a new layer with time dimension enabled
     grass.message(_(f"Creating ImageMosaic layer {workspace}:{layername}..."))
     headers = {"content-type": "application/json"}
@@ -249,6 +278,9 @@ def create_geoserver_layer(
 def update_geoserver_layer(
     layername, workspace, coveragestore, epsg, host, port, auth
 ):
+    """
+    Update an existing GeoServer layer.
+    """
     # updates an existing layer (name and time dimension enabled)
     grass.message(
         _(f"Updating ImageMosaic layer {workspace}:{coveragestore}...")
@@ -274,6 +306,9 @@ def update_geoserver_layer(
 
 
 def zip_mosaic_definition_and_granules(targetdir_grass, zip_basename):
+    """
+    Create a zip archive of the ImageMosaic definition and granules.
+    """
     grass.message(_("Creating ImageMosaic Archive for upload..."))
     make_archive(zip_basename, "zip", targetdir_grass)
     grass.message(_("Archive of ImageMosaic created! "))
@@ -282,6 +317,9 @@ def zip_mosaic_definition_and_granules(targetdir_grass, zip_basename):
 def upload_new_imagemosaic(
     workspace, coveragestore, host, port, auth, zipname
 ):
+    """
+    Upload a new ImageMosaic to GeoServer.
+    """
     grass.message(_("Uploading ImageMosaic..."))
     headers = {"Content-type": "application/zip"}
     url = (
@@ -298,8 +336,13 @@ def upload_new_imagemosaic(
 
 
 def main():
+    """
+    Main function to publish GRASS GIS STRDS to GeoServer.
+    """
 
     global rm_rasters, region
+
+    rm_rasters = []
 
     tgis.init()
     input = options["input"]
