@@ -68,7 +68,9 @@ class TestGeoserverPublish(TestCase):
             f"{cls.baseurl}/rest/workspaces/{workspace}/"
             f"coveragestores/{coveragestore}?recurse=true"
         )
-        resp = requests.delete(url, auth=(cls.geoserver_user, cls.geoserver_password))
+        resp = requests.delete(
+            url, auth=(cls.geoserver_user, cls.geoserver_password)
+        )
         if resp.status_code != 200:
             cls.assertIn(
                 "No such coverage store",
@@ -80,10 +82,14 @@ class TestGeoserverPublish(TestCase):
     def delete_workspace(cls, workspace):
         """Delete the created workspace"""
         url = f"{cls.baseurl}/rest/workspaces/{workspace}?recurse=true"
-        resp = requests.delete(url, auth=(cls.geoserver_user, cls.geoserver_password))
+        resp = requests.delete(
+            url, auth=(cls.geoserver_user, cls.geoserver_password)
+        )
         if resp.status_code != 200:
             cls.assertIn(
-                "Status 404 – Not Found", resp.text, "Workspace can not be deleted!"
+                "Status 404 – Not Found",
+                resp.text,
+                "Workspace can not be deleted!",
             )
 
 
@@ -114,7 +120,9 @@ class TestRGeoserverPublishRaster(TestGeoserverPublish):
             del os.environ["TEST_GEOSERVER_CONNECTION"]
 
     def getGeoServerPath(self):
-        return os.path.join(self.geoserver_grass_path, self.location_name, self.mapset)
+        return os.path.join(
+            self.geoserver_grass_path, self.location_name, self.mapset
+        )
 
     @unittest.skipIf(
         os.environ["TEST_GEOSERVER_CONNECTION"] != "True",
@@ -149,7 +157,9 @@ class TestRGeoserverPublishRaster(TestGeoserverPublish):
             "&HEIGHT=101&BBOX=634509.2720376598%2C221209.27014859256%2C"
             "636437.1464258735%2C223137.14453680618"
         )
-        resp = requests.get(url, auth=(self.geoserver_user, self.geoserver_password))
+        resp = requests.get(
+            url, auth=(self.geoserver_user, self.geoserver_password)
+        )
         self.assertEqual(
             resp.status_code,
             200,
@@ -157,11 +167,15 @@ class TestRGeoserverPublishRaster(TestGeoserverPublish):
         )
         resp_content = json.loads(resp.text)
         self.assertIn("features", resp_content, "'features' not in response")
-        self.assertEqual(1, len(resp_content["features"]), "Length of 'features' not 1")
+        self.assertEqual(
+            1, len(resp_content["features"]), "Length of 'features' not 1"
+        )
         feat = resp_content["features"][0]
         self.assertIn("properties", feat, "'properties' not feature")
         self.assertIn(
-            "elevation", feat["properties"], "'elevation' not features properties"
+            "elevation",
+            feat["properties"],
+            "'elevation' not features properties",
         )
         self.assertEqual(
             121.71666717529297,
@@ -187,7 +201,9 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
     @classmethod
     def setUpClass(cls):
         """Change the mapset"""
-        cls.current_mapset = [x for x in grass.parse_command("g.mapset", flags="p")][0]
+        cls.current_mapset = [
+            x for x in grass.parse_command("g.mapset", flags="p")
+        ][0]
         cls.runModule("g.mapset", mapset=cls.mapset)
 
     @classmethod
@@ -206,7 +222,9 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
             cls.runModule("g.mapset", mapset=cls.current_mapset)
 
     def getGeoServerPath(self):
-        return os.path.join(self.geoserver_grass_path, self.location_name, self.mapset)
+        return os.path.join(
+            self.geoserver_grass_path, self.location_name, self.mapset
+        )
 
     @unittest.skipIf(
         os.environ["TEST_GEOSERVER_CONNECTION"] != "True",
@@ -242,7 +260,9 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
             "%2C769622.726067068%2C386032.9864082438"
         )
 
-        resp = requests.get(url, auth=(self.geoserver_user, self.geoserver_password))
+        resp = requests.get(
+            url, auth=(self.geoserver_user, self.geoserver_password)
+        )
         self.assertEqual(
             resp.status_code,
             200,
@@ -250,14 +270,20 @@ class TestRGeoserverPublishSTRDS(TestGeoserverPublish):
         )
         resp_content = json.loads(resp.text)
         self.assertIn("features", resp_content, "'features' not in response")
-        self.assertEqual(1, len(resp_content["features"]), "Length of 'features' not 1")
+        self.assertEqual(
+            1, len(resp_content["features"]), "Length of 'features' not 1"
+        )
         feat = resp_content["features"][0]
         self.assertIn("properties", feat, "'properties' not feature")
         self.assertIn(
-            "sqlite.db", feat["properties"], "'sqlite.db' not features properties"
+            "sqlite.db",
+            feat["properties"],
+            "'sqlite.db' not features properties",
         )
         self.assertEqual(
-            14193, feat["properties"]["sqlite.db"], "Value of feature is not 14193"
+            14193,
+            feat["properties"]["sqlite.db"],
+            "Value of feature is not 14193",
         )
 
 

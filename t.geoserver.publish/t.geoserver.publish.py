@@ -80,10 +80,10 @@ region = None
 def cleanup():
     """
     Clean up temporary resources created during module execution.
-    
+
     This function is registered as an atexit handler and
     performs cleanup of various temporary data
-    
+
     The cleanup is performed silently with flags set to force removal
     and suppress error output.
     """
